@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truy Cập Camera Trước và Sau</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+      border: 1px solid #ddd;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Truy Cập Camera Trước và Sau</h1>
+  
+  <!-- Video để hiển thị camera -->
+  <video id="video" autoplay></video>
+
+  <!-- Nút để chuyển đổi camera -->
+  <button id="switchCamera">Chuyển Đổi Camera</button>
+
+  <script>
+    let currentStream;
+    let currentCamera = 'user'; // 'user' cho camera trước, 'environment' cho camera sau
+
+    // Hàm để khởi tạo stream cho camera
+    function startCamera(cameraType) {
+      // Dừng stream cũ nếu có
+      if (currentStream) {
+        const tracks = currentStream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+
+      // Lấy quyền truy cập camera
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: cameraType }
+      })
+      .then(function(stream) {
+        // Gán stream vào video
+        document.getElementById('video').srcObject = stream;
+        currentStream = stream;
+      })
+      .catch(function(error) {
+        console.log('Lỗi khi truy cập camera: ', error);
+        alert("Không thể truy cập vào camera của thiết bị.");
+      });
+    }
+
+    // Khởi tạo camera trước khi trang web được tải
+    startCamera(currentCamera);
+
+    // Xử lý chuyển đổi giữa camera trước và camera sau
+    document.getElementById('switchCamera').addEventListener('click', function() {
+      if (currentCamera === 'user') {
+        currentCamera = 'environment'; // Chuyển sang camera sau
+      } else {
+        currentCamera = 'user'; // Chuyển sang camera trước
+      }
+      startCamera(currentCamera);
+    });
+  </script>
+
+</body>
+</html>
